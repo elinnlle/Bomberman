@@ -1,0 +1,405 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		247AB4012EEAFD280039FACF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 247AB4002EEAFD280039FACF /* Assets.xcassets */; };
+		247AB41D2EEAFD850039FACF /* HSESans-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 247AB4142EEAFD850039FACF /* HSESans-Thin.otf */; };
+		247AB41F2EEAFD850039FACF /* HSESans-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 247AB4122EEAFD850039FACF /* HSESans-Regular.otf */; };
+		247AB4202EEAFD850039FACF /* HSESans-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 247AB4102EEAFD850039FACF /* HSESans-Bold.otf */; };
+		247AB4212EEAFD850039FACF /* HSESans-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 247AB4112EEAFD850039FACF /* HSESans-Italic.otf */; };
+		247AB4222EEAFD850039FACF /* HSESans-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 247AB4132EEAFD850039FACF /* HSESans-SemiBold.otf */; };
+		247AB4232EEAFD850039FACF /* FontsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247AB4162EEAFD850039FACF /* FontsExtension.swift */; };
+		247AB4242EEAFD850039FACF /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247AB4182EEAFD850039FACF /* ColorExtension.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		247AB3F92EEAFD270039FACF /* Bomberman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bomberman.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		247AB4002EEAFD280039FACF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		247AB4102EEAFD850039FACF /* HSESans-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HSESans-Bold.otf"; sourceTree = "<group>"; };
+		247AB4112EEAFD850039FACF /* HSESans-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HSESans-Italic.otf"; sourceTree = "<group>"; };
+		247AB4122EEAFD850039FACF /* HSESans-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HSESans-Regular.otf"; sourceTree = "<group>"; };
+		247AB4132EEAFD850039FACF /* HSESans-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HSESans-SemiBold.otf"; sourceTree = "<group>"; };
+		247AB4142EEAFD850039FACF /* HSESans-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HSESans-Thin.otf"; sourceTree = "<group>"; };
+		247AB4162EEAFD850039FACF /* FontsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontsExtension.swift; sourceTree = "<group>"; };
+		247AB4182EEAFD850039FACF /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		247AB4502EEB12A50039FACF /* Exceptions for "Bomberman" folder in "Bomberman" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 247AB3F82EEAFD270039FACF /* Bomberman */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		247AB3FB2EEAFD270039FACF /* Bomberman */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				247AB4502EEB12A50039FACF /* Exceptions for "Bomberman" folder in "Bomberman" target */,
+			);
+			path = Bomberman;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		247AB3F62EEAFD270039FACF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		247AB3F02EEAFD270039FACF = {
+			isa = PBXGroup;
+			children = (
+				247AB3FB2EEAFD270039FACF /* Bomberman */,
+				247AB3FA2EEAFD270039FACF /* Products */,
+				247AB41C2EEAFD850039FACF /* Utilities */,
+			);
+			sourceTree = "<group>";
+		};
+		247AB3FA2EEAFD270039FACF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				247AB3F92EEAFD270039FACF /* Bomberman.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		247AB4152EEAFD850039FACF /* HSESans */ = {
+			isa = PBXGroup;
+			children = (
+				247AB4102EEAFD850039FACF /* HSESans-Bold.otf */,
+				247AB4112EEAFD850039FACF /* HSESans-Italic.otf */,
+				247AB4122EEAFD850039FACF /* HSESans-Regular.otf */,
+				247AB4132EEAFD850039FACF /* HSESans-SemiBold.otf */,
+				247AB4142EEAFD850039FACF /* HSESans-Thin.otf */,
+			);
+			path = HSESans;
+			sourceTree = "<group>";
+		};
+		247AB4172EEAFD850039FACF /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				247AB4152EEAFD850039FACF /* HSESans */,
+				247AB4162EEAFD850039FACF /* FontsExtension.swift */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		247AB41A2EEAFD850039FACF /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				247AB4172EEAFD850039FACF /* Fonts */,
+				247AB4182EEAFD850039FACF /* ColorExtension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		247AB41C2EEAFD850039FACF /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				247AB41A2EEAFD850039FACF /* Extension */,
+				247AB4002EEAFD280039FACF /* Assets.xcassets */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		247AB3F82EEAFD270039FACF /* Bomberman */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 247AB4042EEAFD280039FACF /* Build configuration list for PBXNativeTarget "Bomberman" */;
+			buildPhases = (
+				247AB3F52EEAFD270039FACF /* Sources */,
+				247AB3F62EEAFD270039FACF /* Frameworks */,
+				247AB3F72EEAFD270039FACF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				247AB3FB2EEAFD270039FACF /* Bomberman */,
+			);
+			name = Bomberman;
+			packageProductDependencies = (
+			);
+			productName = Bomberman;
+			productReference = 247AB3F92EEAFD270039FACF /* Bomberman.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		247AB3F12EEAFD270039FACF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					247AB3F82EEAFD270039FACF = {
+						CreatedOnToolsVersion = 16.4;
+					};
+				};
+			};
+			buildConfigurationList = 247AB3F42EEAFD270039FACF /* Build configuration list for PBXProject "Bomberman" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 247AB3F02EEAFD270039FACF;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 247AB3FA2EEAFD270039FACF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				247AB3F82EEAFD270039FACF /* Bomberman */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		247AB3F72EEAFD270039FACF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				247AB4012EEAFD280039FACF /* Assets.xcassets in Resources */,
+				247AB41D2EEAFD850039FACF /* HSESans-Thin.otf in Resources */,
+				247AB41F2EEAFD850039FACF /* HSESans-Regular.otf in Resources */,
+				247AB4202EEAFD850039FACF /* HSESans-Bold.otf in Resources */,
+				247AB4212EEAFD850039FACF /* HSESans-Italic.otf in Resources */,
+				247AB4222EEAFD850039FACF /* HSESans-SemiBold.otf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		247AB3F52EEAFD270039FACF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				247AB4232EEAFD850039FACF /* FontsExtension.swift in Sources */,
+				247AB4242EEAFD850039FACF /* ColorExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		247AB4022EEAFD280039FACF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		247AB4032EEAFD280039FACF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		247AB4052EEAFD280039FACF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Bomberman/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = HSE.Bomberman;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		247AB4062EEAFD280039FACF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Bomberman/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = HSE.Bomberman;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		247AB3F42EEAFD270039FACF /* Build configuration list for PBXProject "Bomberman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				247AB4022EEAFD280039FACF /* Debug */,
+				247AB4032EEAFD280039FACF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		247AB4042EEAFD280039FACF /* Build configuration list for PBXNativeTarget "Bomberman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				247AB4052EEAFD280039FACF /* Debug */,
+				247AB4062EEAFD280039FACF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 247AB3F12EEAFD270039FACF /* Project object */;
+}
