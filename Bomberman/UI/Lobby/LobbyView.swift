@@ -7,15 +7,29 @@ import SwiftUI
 
 struct LobbyView: View {
     @EnvironmentObject var gameClient: GameClient
+    @State private var showLeaderboard = false
     
     var body: some View {
         VStack(spacing: 16) {
-            HStack {
+            
+            HStack(spacing: 12) {
                 Text("Комната")
                     .appFont(.sansBold, size: 24)
                     .foregroundColor(.mainTextColor)
                 
                 Spacer()
+                
+                Button {
+                    showLeaderboard = true
+                } label: {
+                    Text("Статистика")
+                        .appFont(.sansRegular, size: 14)
+                        .foregroundColor(.secondaryTextColor)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.lightGrayApp)
+                        .cornerRadius(10)
+                }
                 
                 Button {
                     gameClient.leaveRoom()
@@ -42,43 +56,14 @@ struct LobbyView: View {
                 .padding(.horizontal, 24)
             }
             
-            List {
-                Section {
-                    ForEach(gameClient.players) { player in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(player.name)
-                                    .appFont(.sansSemiBold, size: 16)
-                                    .foregroundColor(.mainTextColor)
-                                
-                                Text(player.role.title)
-                                    .appFont(.sansRegular, size: 12)
-                                    .foregroundColor(.secondaryTextColor)
-                            }
-                            
-                            Spacer()
-                            
-                            Text(player.readyStatus == .ready ? "Готов" : "Не готов")
-                                .appFont(.sansRegular, size: 14)
-                                .foregroundColor(player.readyStatus == .ready ? .greenAccent : .secondaryTextColor)
-                            
-                            if player.isMe {
-                                Text("Вы")
-                                    .appFont(.sansRegular, size: 12)
-                                    .foregroundColor(.secondaryTextColor)
-                                    .padding(.leading, 4)
-                            }
-                        }
-                        .listRowBackground(Color.grayApp)
-                    }
-                } header: {
-                    Text("Игроки")
-                        .appFont(.sansRegular, size: 14)
-                        .foregroundColor(.secondaryTextColor)
+            VStack(spacing: 12) {
+                ForEach(gameClient.players) { player in
+                    playerCard(player)
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.blackApp)
+            .padding(.horizontal, 24)
+            
+            Spacer()
             
             VStack(spacing: 12) {
                 Button {
@@ -108,5 +93,50 @@ struct LobbyView: View {
             .padding(.bottom, 24)
         }
         .background(Color.blackApp.ignoresSafeArea())
+        .sheet(isPresented: $showLeaderboard) {
+            LeaderboardView()
+                .environmentObject(gameClient)
+        }
+    }
+}
+
+private extension LobbyView {
+    func playerCard(_ player: PlayerSummary) -> some View {
+        let statusColor: Color = player.readyStatus == .ready ? .green : .secondaryTextColor
+        
+        return HStack(spacing: 14) {
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(player.name)
+                    .appFont(.sansSemiBold, size: 16)
+                    .foregroundColor(.mainTextColor)
+                
+                Text(player.role.title)
+                    .appFont(.sansRegular, size: 12)
+                    .foregroundColor(.secondaryTextColor)
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 6) {
+                Text(player.readyStatus == .ready ? "Готов" : "Не готов")
+                    .appFont(.sansRegular, size: 14)
+                    .foregroundColor(statusColor)
+
+                if player.isMe {
+                    Text("•")
+                        .foregroundColor(.secondaryTextColor)
+                    
+                    Text("Вы")
+                        .appFont(.sansRegular, size: 12)
+                        .foregroundColor(.secondaryTextColor)
+                }
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.grayApp)
+        )
     }
 }

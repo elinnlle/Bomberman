@@ -57,3 +57,15 @@ struct TutorialPage: Identifiable {
     let title: String
     let message: String
 }
+
+struct PlayerStats: Identifiable, Equatable {
+    let id: String
+    var name: String
+    var wins: Int
+    var losses: Int
+    var draws: Int
+    
+    var gamesPlayed: Int {
+        wins + losses + draws
+    }
+}

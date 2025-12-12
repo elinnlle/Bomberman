@@ -17,6 +17,7 @@ final class GameClient: ObservableObject {
     @Published var roundPhase: RoundPhase = .notInRound
     @Published var roundTimeRemaining: TimeInterval = 0
     @Published var lastRoundResult: RoundResult?
+    @Published var playerStats: [String: PlayerStats] = [:]
     
     private var roundTimer: Timer?
     
@@ -51,6 +52,9 @@ final class GameClient: ObservableObject {
         roundPhase = .notInRound
         roundTimeRemaining = 0
         lastRoundResult = nil
+        
+        ensureStats(for: mePlayer)
+        ensureStats(for: otherPlayer)
         
         // Здесь потом человек, пишущий WebSocket, вместо этой заглушки
         // вставит реальный вызов join_message {"type": "join", ...}
@@ -90,7 +94,7 @@ final class GameClient: ObservableObject {
                 } else {
                     timer.invalidate()
                     self.roundPhase = .finished
-                    self.lastRoundResult = .draw
+                    self.finishRound(with: .draw)
                 }
             }
         }
@@ -100,6 +104,10 @@ final class GameClient: ObservableObject {
         roundTimer?.invalidate()
         roundPhase = .finished
         lastRoundResult = result
+        
+        if let result {
+            applyResultToStats(result)
+        }
     }
     
     func leaveRoom() {
@@ -111,5 +119,42 @@ final class GameClient: ObservableObject {
         roundPhase = .notInRound
         roundTimeRemaining = 0
         lastRoundResult = nil
+    }
+    
+    private func ensureStats(for player: PlayerSummary) {
+        if playerStats[player.id] == nil {
+            playerStats[player.id] = PlayerStats(
+                id: player.id,
+                name: player.name,
+                wins: 0,
+                losses: 0,
+                draws: 0
+            )
+        } else {
+            var existing = playerStats[player.id]
+            existing?.name = player.name
+            if let updated = existing {
+                playerStats[player.id] = updated
+            }
+        }
+    }
+    
+    private func applyResultToStats(_ result: RoundResult) {
+        guard let mePlayer = me else { return }
+        
+        ensureStats(for: mePlayer)
+        
+        guard var stats = playerStats[mePlayer.id] else { return }
+        
+        switch result {
+        case .victory:
+            stats.wins += 1
+        case .defeat:
+            stats.losses += 1
+        case .draw:
+            stats.draws += 1
+        }
+        
+        playerStats[mePlayer.id] = stats
     }
 }
