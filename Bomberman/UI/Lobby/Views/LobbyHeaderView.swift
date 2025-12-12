@@ -8,6 +8,7 @@ import SwiftUI
 struct LobbyHeaderView: View {
     let title: String
     let onShowLeaderboard: () -> Void
+    let onShowMatchHistory: () -> Void
     let onLeave: () -> Void
 
     var body: some View {
@@ -20,6 +21,16 @@ struct LobbyHeaderView: View {
 
             Button(action: onShowLeaderboard) {
                 Text("Статистика")
+                    .appFont(.sansRegular, size: 14)
+                    .foregroundColor(.secondaryTextColor)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.lightGrayApp)
+                    .cornerRadius(10)
+            }
+
+            Button(action: onShowMatchHistory) {
+                Text("История")
                     .appFont(.sansRegular, size: 14)
                     .foregroundColor(.secondaryTextColor)
                     .padding(.horizontal, 12)
