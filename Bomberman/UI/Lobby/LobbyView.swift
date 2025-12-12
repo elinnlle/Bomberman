@@ -8,6 +8,7 @@ import SwiftUI
 struct LobbyView: View {
     @EnvironmentObject var gameClient: GameClient
     @State private var showLeaderboard = false
+    @State private var selectedPlayerForAchievements: PlayerSummary?
     
     var body: some View {
         VStack(spacing: 16) {
@@ -97,6 +98,10 @@ struct LobbyView: View {
             LeaderboardView()
                 .environmentObject(gameClient)
         }
+        .sheet(item: $selectedPlayerForAchievements) { player in
+            AchievementsView(player: player)
+                .environmentObject(gameClient)
+        }
     }
 }
 
@@ -105,7 +110,6 @@ private extension LobbyView {
         let statusColor: Color = player.readyStatus == .ready ? .green : .secondaryTextColor
         
         return HStack(spacing: 14) {
-            
             VStack(alignment: .leading, spacing: 4) {
                 Text(player.name)
                     .appFont(.sansSemiBold, size: 16)
@@ -114,23 +118,34 @@ private extension LobbyView {
                 Text(player.role.title)
                     .appFont(.sansRegular, size: 12)
                     .foregroundColor(.secondaryTextColor)
+                
+                HStack(spacing: 6) {
+                    Text(player.readyStatus == .ready ? "Готов" : "Не готов")
+                        .appFont(.sansRegular, size: 14)
+                        .foregroundColor(statusColor)
+
+                    if player.isMe {
+                        Text("•")
+                            .foregroundColor(.secondaryTextColor)
+                        
+                        Text("Вы")
+                            .appFont(.sansRegular, size: 14)
+                            .foregroundColor(.secondaryTextColor)
+                    }
+                }
             }
             
             Spacer()
             
-            HStack(spacing: 6) {
-                Text(player.readyStatus == .ready ? "Готов" : "Не готов")
-                    .appFont(.sansRegular, size: 14)
-                    .foregroundColor(statusColor)
-
-                if player.isMe {
-                    Text("•")
-                        .foregroundColor(.secondaryTextColor)
-                    
-                    Text("Вы")
-                        .appFont(.sansRegular, size: 12)
-                        .foregroundColor(.secondaryTextColor)
-                }
+            Button {
+                selectedPlayerForAchievements = player
+            } label: {
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.mainTextColor)
+                    .padding(8)
+                    .background(Color.lightGrayApp)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
         .padding()
