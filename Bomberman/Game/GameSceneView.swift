@@ -13,24 +13,41 @@ struct GameSceneView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            SpriteView(scene: sceneHolder.scene, options: [.ignoresSiblingOrder])
-                .ignoresSafeArea()
-                .onAppear {
-                    sceneHolder.scene.size = geometry.size
-                    updateScene()
-                }
-                .onChange(of: geometry.size) { _, newSize in
-                    sceneHolder.scene.size = newSize
-                }
-                .onChange(of: gameClient.gameState) { _, _ in
-                    updateScene()
-                }
+            // Показываем сцену только если есть gameState и мы в раунде
+            if gameClient.gameState != nil && 
+               (gameClient.roundPhase == .running || gameClient.roundPhase == .finished) {
+                SpriteView(scene: sceneHolder.scene, options: [.ignoresSiblingOrder])
+                    .ignoresSafeArea()
+                    .onAppear {
+                        sceneHolder.scene.size = geometry.size
+                        updateScene()
+                    }
+                    .onChange(of: geometry.size) { _, newSize in
+                        sceneHolder.scene.size = newSize
+                    }
+                    .onChange(of: gameClient.gameState) { _, _ in
+                        updateScene()
+                    }
+                    .onChange(of: gameClient.roundPhase) { _, _ in
+                        if gameClient.roundPhase == .notInRound {
+                            sceneHolder.scene.reset()
+                        }
+                    }
+            } else {
+                // Пустой view когда нет игры
+                Color.clear
+                    .onAppear {
+                        sceneHolder.scene.reset()
+                    }
+            }
         }
     }
     
     private func updateScene() {
         if let state = gameClient.gameState {
             sceneHolder.scene.update(with: state, myPlayerId: gameClient.myPlayerId)
+        } else {
+            sceneHolder.scene.reset()
         }
     }
 }

@@ -56,6 +56,8 @@ final class WebSocketClient: NSObject {
             jsonObject = ["type": "move", "dx": dx, "dy": dy]
         case .placeBomb:
             jsonObject = ["type": "place_bomb"]
+        case .surrender:
+            jsonObject = ["type": "surrender"]
         }
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject),
@@ -167,5 +169,6 @@ enum ClientMessage {
     case ready
     case move(dx: Int, dy: Int)
     case placeBomb
+    case surrender
 }
 

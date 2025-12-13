@@ -29,6 +29,7 @@ final class GameClient: ObservableObject {
     private var pendingConnectionName: String?
     private var pendingConnectionRole: PlayerRole?
     private var hasSurrendered: Bool = false
+    private var isReturningToLobby: Bool = false
     
     // URL сервера - можно настроить через настройки приложения
     private let serverURL: URL = {
@@ -65,6 +66,20 @@ final class GameClient: ObservableObject {
                 
                 self.connectionState = .connected
                 
+                // Для наблюдателя создаём me сразу, так как сервер не отправляет assign_id
+                if role == .spectator {
+                    let spectatorId = UUID().uuidString
+                    self.myPlayerId = spectatorId
+                    let mePlayer = PlayerSummary(
+                        id: spectatorId,
+                        name: name,
+                        role: role,
+                        readyStatus: .notReady,
+                        isMe: true
+                    )
+                    self.me = mePlayer
+                }
+                
                 // Отправляем сообщение о подключении
                 let roleString = role == .player ? "player" : "spectator"
                 let message: ClientMessage = .join(name: name, role: roleString)
@@ -75,7 +90,9 @@ final class GameClient: ObservableObject {
         webSocketClient?.onDisconnected = { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
-                if self.connectionState == .connected {
+                // Отключение только если мы были подключены и не в процессе игры
+                // Если игра идёт — возможно это временная проблема
+                if self.connectionState == .connected && self.roundPhase == .notInRound {
                     self.connectionState = .disconnected
                     self.cleanup()
                 }
@@ -85,8 +102,13 @@ final class GameClient: ObservableObject {
         webSocketClient?.onError = { [weak self] error in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
-                self.connectionState = .failed(error.localizedDescription)
-                self.cleanup()
+                // Логируем ошибку, но не отключаемся сразу — возможно это временная проблема
+                print("WebSocket error: \(error.localizedDescription)")
+                // Отключаемся только если соединение потеряно полностью
+                if self.connectionState == .connecting {
+                    self.connectionState = .failed(error.localizedDescription)
+                    self.cleanup()
+                }
             }
         }
         
@@ -149,8 +171,39 @@ final class GameClient: ObservableObject {
     
     func returnToLobby() {
         hasSurrendered = false
+        isReturningToLobby = true  // Помечаем что возвращаемся в лобби
         roundPhase = .notInRound
         lastRoundResult = nil
+        gameState = nil  // Сбрасываем игровое состояние сразу
+        roundTimeRemaining = 0  // Сбрасываем таймер
+    }
+    
+    func surrenderAndReturnToLobby() {
+        // Отправляем surrender на сервер - сервер пометит нас как мёртвых
+        webSocketClient?.send(.surrender)
+        
+        // Помечаем локально что сдались
+        hasSurrendered = true
+        
+        // Записываем поражение в статистику
+        finishRound(with: .defeat)
+        
+        // Сбрасываем ready статус
+        isReady = false
+        if var updatedMe = me {
+            updatedMe.readyStatus = .notReady
+            me = updatedMe
+        }
+        
+        // Обновляем статус в списке игроков
+        players = players.map { player in
+            if player.id == myPlayerId {
+                var updated = player
+                updated.readyStatus = .notReady
+                return updated
+            }
+            return player
+        }
     }
     
     private func cleanup() {
@@ -169,6 +222,7 @@ final class GameClient: ObservableObject {
         pendingConnectionName = nil
         pendingConnectionRole = nil
         hasSurrendered = false
+        isReturningToLobby = false
     }
     
     private func handleServerMessage(_ message: ServerMessage) {
@@ -194,9 +248,14 @@ final class GameClient: ObservableObject {
     }
     
     private func updateGameState(_ state: GameState) {
+        // Если мы возвращаемся в лобби, игнорируем все обновления кроме WAITING
+        if isReturningToLobby && state.state != .waiting {
+            return
+        }
+        
         gameState = state
         
-        // Обновляем список игроков
+        // Обновляем список игроков из состояния сервера
         let newPlayers = state.players.map { playerPos in
             PlayerSummary(
                 id: playerPos.id,
@@ -218,24 +277,29 @@ final class GameClient: ObservableObject {
             isReady = myPlayerPos.ready
         }
         
-        // Если игрок сдался — не обновляем фазу раунда от сервера
-        if hasSurrendered {
-            // Только обновляем таймер для отображения
-            if let timeRemaining = state.timeRemaining {
-                roundTimeRemaining = max(0, timeRemaining)
-            }
-            return
-        }
-        
         // Обновляем фазу раунда
         switch state.state {
         case .waiting:
+            // Всегда переходим в лобби когда сервер говорит WAITING
             roundPhase = .notInRound
             roundTimeRemaining = 0
             lastRoundResult = nil
-            hasSurrendered = false  // Сбрасываем флаг при возврате в лобби
+            hasSurrendered = false
+            isReturningToLobby = false  // Сбрасываем флаг возврата
+            // Сбрасываем gameState чтобы карта не обновлялась
+            gameState = nil
+            // Статусы готовности уже обновлены из сервера выше (сервер сбрасывает их при reset())
             
         case .inProgress:
+            // Если игрок сдался — не возвращаем его в игру
+            if hasSurrendered {
+                if let timeRemaining = state.timeRemaining {
+                    roundTimeRemaining = max(0, timeRemaining)
+                }
+                return
+            }
+            
+            // Устанавливаем running для всех (включая наблюдателей)
             if roundPhase != .running {
                 roundPhase = .running
                 lastRoundResult = nil
@@ -247,14 +311,60 @@ final class GameClient: ObservableObject {
             }
             
         case .gameOver:
+            // Всегда устанавливаем finished и определяем результат при GAME_OVER
+            // Это важно для наблюдателей, которые могут не иметь roundPhase == .running
             if roundPhase != .finished {
                 roundPhase = .finished
-                determineRoundResult(from: state)
+            }
+            // Определяем результат (важно вызывать даже если уже finished, чтобы обновить результат)
+            determineRoundResult(from: state)
+            
+            // Сбрасываем ready статус у всех игроков сразу при завершении игры
+            isReady = false
+            if var updatedMe = me {
+                updatedMe.readyStatus = .notReady
+                me = updatedMe
+            }
+            // Обновляем статусы всех игроков на notReady
+            players = players.map { player in
+                var updated = player
+                updated.readyStatus = .notReady
+                return updated
             }
         }
     }
     
     private func determineRoundResult(from state: GameState) {
+        // Проверяем, наблюдатель ли мы
+        let isSpectator = me?.role == .spectator || myPlayerId == nil
+        
+        if isSpectator {
+            // Для наблюдателя показываем результат игры (победитель/ничья), но не личный результат
+            if let winner = state.winner {
+                if winner == "НИЧЬЯ" {
+                    lastRoundResult = .draw
+                } else {
+                    // Для наблюдателя показываем ничью (не победа и не поражение)
+                    // Можно было бы показать .draw, но лучше показать что игра завершена
+                    lastRoundResult = .draw
+                }
+            } else {
+                // Определяем по количеству выживших
+                let alivePlayers = state.players.filter { $0.alive }
+                if alivePlayers.count == 0 {
+                    lastRoundResult = .draw
+                } else if alivePlayers.count == 1 {
+                    // Есть победитель - для наблюдателя это ничья (он не участвовал)
+                    lastRoundResult = .draw
+                } else {
+                    lastRoundResult = .draw
+                }
+            }
+            // Не применяем результат к статистике для наблюдателя
+            return
+        }
+        
+        // Для игрока определяем личный результат
         guard let myId = myPlayerId else {
             lastRoundResult = nil
             return
