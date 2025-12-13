@@ -14,13 +14,11 @@ struct ConnectRolePickerView: View {
                 .appFont(.sansRegular, size: 16)
                 .foregroundColor(.secondaryTextColor)
 
-            Picker("", selection: $selectedRole) {
-                ForEach(PlayerRole.allCases) { role in
-                    Text(role.title)
-                        .tag(role)
-                }
-            }
-            .pickerStyle(.segmented)
+            AppSegmentedControl(
+                items: PlayerRole.allCases,
+                selection: $selectedRole,
+                title: { $0.title }
+            )
         }
         .padding(.horizontal, 24)
     }
