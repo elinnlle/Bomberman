@@ -30,6 +30,7 @@ final class GameClient: ObservableObject {
     private var pendingConnectionRole: PlayerRole?
     private var hasSurrendered: Bool = false
     private var isReturningToLobby: Bool = false
+    private var statsAppliedForCurrentRound: Bool = false
     
     // URL сервера - можно настроить через настройки приложения
     private let serverURL: URL = {
@@ -143,7 +144,8 @@ final class GameClient: ObservableObject {
             let mePlayer = me
         else { return }
 
-        applyResultToStats(result)
+        // Статистика применяется в determineRoundResult, не дублируем здесь
+        // applyResultToStats(result)
 
         let entry = RoundHistoryEntry(
             playerId: mePlayer.id,
@@ -223,6 +225,7 @@ final class GameClient: ObservableObject {
         pendingConnectionRole = nil
         hasSurrendered = false
         isReturningToLobby = false
+        statsAppliedForCurrentRound = false
     }
     
     private func handleServerMessage(_ message: ServerMessage) {
@@ -286,6 +289,7 @@ final class GameClient: ObservableObject {
             lastRoundResult = nil
             hasSurrendered = false
             isReturningToLobby = false  // Сбрасываем флаг возврата
+            statsAppliedForCurrentRound = false  // Сбрасываем флаг статистики
             // Сбрасываем gameState чтобы карта не обновлялась
             gameState = nil
             // Статусы готовности уже обновлены из сервера выше (сервер сбрасывает их при reset())
@@ -303,6 +307,7 @@ final class GameClient: ObservableObject {
             if roundPhase != .running {
                 roundPhase = .running
                 lastRoundResult = nil
+                statsAppliedForCurrentRound = false  // Сбрасываем флаг для нового раунда
             }
             
             // Обновляем таймер
@@ -401,9 +406,10 @@ final class GameClient: ObservableObject {
             }
         }
         
-        // Применяем результат к статистике
-        if let result = lastRoundResult {
+        // Применяем результат к статистике только один раз за раунд
+        if let result = lastRoundResult, !statsAppliedForCurrentRound {
             applyResultToStats(result)
+            statsAppliedForCurrentRound = true
         }
     }
     
