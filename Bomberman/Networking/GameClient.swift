@@ -18,6 +18,7 @@ final class GameClient: ObservableObject {
     @Published var roundTimeRemaining: TimeInterval = 0
     @Published var lastRoundResult: RoundResult?
     @Published var playerStats: [String: PlayerStats] = [:]
+    @Published var roundHistory: [String: [RoundHistoryEntry]] = [:]
     
     // Игровое состояние
     @Published var gameState: GameState?
@@ -112,10 +113,21 @@ final class GameClient: ObservableObject {
         roundTimer?.invalidate()
         roundPhase = .finished
         lastRoundResult = result
-        
-        if let result {
-            applyResultToStats(result)
-        }
+
+        guard
+            let result,
+            let mePlayer = me
+        else { return }
+
+        applyResultToStats(result)
+
+        let entry = RoundHistoryEntry(
+            playerId: mePlayer.id,
+            result: result,
+            duration: 90 - roundTimeRemaining
+        )
+
+        roundHistory[mePlayer.id, default: []].append(entry)
     }
     
     func leaveRoom() {

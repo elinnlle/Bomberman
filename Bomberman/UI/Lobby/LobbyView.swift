@@ -8,6 +8,7 @@ import SwiftUI
 struct LobbyView: View {
     @EnvironmentObject var gameClient: GameClient
     @State private var showLeaderboard = false
+    @State private var showMatchHistory = false
     @State private var selectedPlayerForAchievements: PlayerSummary?
 
     var body: some View {
@@ -15,6 +16,7 @@ struct LobbyView: View {
             LobbyHeaderView(
                 title: "Комната",
                 onShowLeaderboard: { showLeaderboard = true },
+                onShowMatchHistory: { showMatchHistory = true },
                 onLeave: { gameClient.leaveRoom() }
             )
             .padding(.horizontal, 24)
@@ -44,6 +46,12 @@ struct LobbyView: View {
         .sheet(isPresented: $showLeaderboard) {
             LeaderboardView()
                 .environmentObject(gameClient)
+        }
+        .sheet(isPresented: $showMatchHistory) {
+            if let me = gameClient.me {
+                MatchHistoryView(player: me)
+                    .environmentObject(gameClient)
+            }
         }
         .sheet(item: $selectedPlayerForAchievements) { player in
             AchievementsView(player: player)
