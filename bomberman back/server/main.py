@@ -241,7 +241,11 @@ class Game:
 
     def spawn_random_bomb(self):
         if random.random() < ENDGAME_BOMB_CHANCE:
-            empty_tiles = [(x, y) for y, row in enumerate(self.map) for x, tile in enumerate(row) if self.original_map[y][x] in [' ', 'p', '.']]
+            # Проверяем текущее состояние карты, а не только original_map
+            # Бомба может заспавниться только на пустых тайлах (не стена и не кирпич)
+            empty_tiles = [(x, y) for y, row in enumerate(self.map) 
+                          for x, tile in enumerate(row) 
+                          if self.map[y][x] == ' ' and self.original_map[y][x] in [' ', 'p', '.']]
             if empty_tiles:
                 x, y = random.choice(empty_tiles)
                 self.place_bomb(x, y)
@@ -257,6 +261,9 @@ class Game:
     def create_explosion(self, start_x, start_y):
         self.explosions.append(Explosion(start_x, start_y))
         self._check_collisions(start_x, start_y)
+        # Разрушаем кирпич под бомбой, если он есть
+        if 0 <= start_x < GRID_WIDTH and 0 <= start_y < GRID_HEIGHT and self.map[start_y][start_x] == '.':
+            self.map[start_y][start_x] = ' '
         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             for i in range(1, BLAST_RADIUS + 1):
                 x, y = start_x + dx * i, start_y + dy * i
