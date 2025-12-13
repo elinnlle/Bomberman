@@ -20,13 +20,6 @@ final class GameScene: SKScene {
     private let floorColor2 = SKColor(red: 0.196, green: 0.196, blue: 0.196, alpha: 1.0)
     private let myPlayerColor = SKColor(red: 0.196, green: 0.588, blue: 1.0, alpha: 1.0)
     private let otherPlayerColor = SKColor(red: 1.0, green: 0.549, blue: 0.0, alpha: 1.0)
-    private let bombColor = SKColor(red: 0.078, green: 0.078, blue: 0.078, alpha: 1.0)
-    private let fuseColor = SKColor.yellow
-    private let explosionColors: [SKColor] = [
-        SKColor(red: 1.0, green: 0.420, blue: 0.0, alpha: 1.0),
-        SKColor(red: 1.0, green: 0.647, blue: 0.0, alpha: 1.0),
-        SKColor(red: 1.0, green: 0.816, blue: 0.0, alpha: 1.0)
-    ]
     
     // MARK: - Layers
     
@@ -81,6 +74,24 @@ final class GameScene: SKScene {
         updateBombs(gameState.bombs)
         updateExplosions(gameState.explosions)
         updatePlayers(gameState.players)
+    }
+    
+    func reset() {
+        // Сбрасываем состояние для новой игры
+        mapInitialized = false
+        currentGameState = nil
+        myPlayerId = nil
+        
+        // Очищаем все слои
+        floorLayer.removeAllChildren()
+        wallLayer.removeAllChildren()
+        bombLayer.removeAllChildren()
+        explosionLayer.removeAllChildren()
+        playerLayer.removeAllChildren()
+        
+        // Очищаем кеши
+        bombNodes.removeAll()
+        playerNodes.removeAll()
     }
     
     // MARK: - Tile Size
@@ -224,30 +235,69 @@ final class GameScene: SKScene {
         let container = SKNode()
         container.zPosition = 10
         
-        // Тело бомбы
-        let body = SKShapeNode(circleOfRadius: tileSize / 2 - 4)
-        body.fillColor = bombColor
-        body.strokeColor = .clear
-        body.zPosition = 1
-        container.addChild(body)
+        let radius = tileSize * 0.42
         
-        // Быстрая пульсация
-        let pulseUp = SKAction.scale(to: 1.1, duration: 0.2)
-        let pulseDown = SKAction.scale(to: 1.0, duration: 0.2)
-        let pulse = SKAction.sequence([pulseUp, pulseDown])
-        body.run(SKAction.repeatForever(pulse))
+        // Светлая полоска арбуза (фон)
+        let lightGreen = SKColor(red: 0.4, green: 0.8, blue: 0.4, alpha: 1.0)
+        let darkGreen = SKColor(red: 0.13, green: 0.55, blue: 0.13, alpha: 1.0)
+        let darkerGreen = SKColor(red: 0.0, green: 0.4, blue: 0.0, alpha: 1.0)
         
-        // Фитиль
-        let fuse = SKSpriteNode(color: fuseColor, size: CGSize(width: 4, height: 8))
-        fuse.position = CGPoint(x: 0, y: tileSize / 2 - 6)
-        fuse.zPosition = 2
-        container.addChild(fuse)
+        // Основа арбуза
+        let base = SKShapeNode(circleOfRadius: radius)
+        base.fillColor = darkGreen
+        base.strokeColor = darkerGreen
+        base.lineWidth = 2
+        base.zPosition = 1
+        container.addChild(base)
         
-        // Мигание фитиля
-        let fadeOut = SKAction.fadeAlpha(to: 0.3, duration: 0.15)
-        let fadeIn = SKAction.fadeAlpha(to: 1.0, duration: 0.15)
-        let blink = SKAction.sequence([fadeOut, fadeIn])
-        fuse.run(SKAction.repeatForever(blink))
+        // Полоски - волнистые линии
+        for i in 0..<6 {
+            let angle = CGFloat(i) * .pi / 3
+            let stripe = SKShapeNode(rectOf: CGSize(width: 2, height: radius * 1.5))
+            stripe.fillColor = darkerGreen
+            stripe.strokeColor = .clear
+            stripe.zRotation = angle
+            stripe.zPosition = 2
+            container.addChild(stripe)
+        }
+        
+        // Блик (светлое пятно)
+        let highlight = SKShapeNode(ellipseOf: CGSize(width: radius * 0.4, height: radius * 0.25))
+        highlight.fillColor = lightGreen
+        highlight.strokeColor = .clear
+        highlight.alpha = 0.6
+        highlight.position = CGPoint(x: -radius * 0.3, y: radius * 0.3)
+        highlight.zPosition = 3
+        container.addChild(highlight)
+        
+        // Хвостик
+        let stem = SKSpriteNode(color: SKColor(red: 0.45, green: 0.3, blue: 0.15, alpha: 1.0),
+                                size: CGSize(width: 4, height: tileSize * 0.2))
+        stem.position = CGPoint(x: 0, y: radius + tileSize * 0.08)
+        stem.zPosition = 4
+        container.addChild(stem)
+        
+        // Листик
+        let leaf = SKShapeNode(ellipseOf: CGSize(width: tileSize * 0.2, height: tileSize * 0.12))
+        leaf.fillColor = SKColor(red: 0.3, green: 0.75, blue: 0.3, alpha: 1.0)
+        leaf.strokeColor = .clear
+        leaf.position = CGPoint(x: tileSize * 0.1, y: radius + tileSize * 0.12)
+        leaf.zRotation = .pi / 5
+        leaf.zPosition = 4
+        container.addChild(leaf)
+        
+        // Анимация: тряска перед взрывом
+        let shakeRight = SKAction.moveBy(x: 2, y: 0, duration: 0.05)
+        let shakeLeft = SKAction.moveBy(x: -4, y: 0, duration: 0.1)
+        let shakeBack = SKAction.moveBy(x: 2, y: 0, duration: 0.05)
+        let shake = SKAction.sequence([shakeRight, shakeLeft, shakeBack])
+        
+        // Пульсация + покраснение
+        let scaleUp = SKAction.scale(to: 1.1, duration: 0.1)
+        let scaleDown = SKAction.scale(to: 0.95, duration: 0.1)
+        let pulse = SKAction.sequence([scaleUp, scaleDown, shake])
+        
+        container.run(SKAction.repeatForever(pulse))
         
         return container
     }
@@ -283,20 +333,52 @@ final class GameScene: SKScene {
         let container = SKNode()
         container.zPosition = 15
         
-        // Центральный взрыв
-        let center = SKShapeNode(circleOfRadius: tileSize / 2)
-        center.fillColor = explosionColors.randomElement() ?? .orange
-        center.strokeColor = .clear
-        center.alpha = 0.9
-        container.addChild(center)
+        // Арбузные цвета для взрыва (красная мякоть + зелёные осколки)
+        let redColors: [SKColor] = [
+            SKColor(red: 1.0, green: 0.2, blue: 0.2, alpha: 1.0),  // Красный
+            SKColor(red: 0.95, green: 0.3, blue: 0.3, alpha: 1.0), // Светло-красный
+            SKColor(red: 0.85, green: 0.15, blue: 0.15, alpha: 1.0) // Тёмно-красный
+        ]
         
-        // Внутренний яркий круг
-        let inner = SKShapeNode(circleOfRadius: tileSize / 4)
-        inner.fillColor = .white
-        inner.strokeColor = .clear
-        inner.alpha = 0.7
-        inner.zPosition = 1
-        container.addChild(inner)
+        // Основной взрыв (красная мякоть арбуза)
+        let mainBlast = SKShapeNode(circleOfRadius: tileSize * 0.45)
+        mainBlast.fillColor = redColors[0]
+        mainBlast.strokeColor = .clear
+        mainBlast.alpha = 0.95
+        mainBlast.zPosition = 1
+        container.addChild(mainBlast)
+        
+        // Яркий центр
+        let core = SKShapeNode(circleOfRadius: tileSize * 0.2)
+        core.fillColor = SKColor(red: 1.0, green: 0.6, blue: 0.6, alpha: 1.0)
+        core.strokeColor = .clear
+        core.zPosition = 2
+        container.addChild(core)
+        
+        // Семечки арбуза (чёрные точки)
+        for i in 0..<5 {
+            let angle = CGFloat(i) * .pi * 2 / 5 + CGFloat.random(in: -0.3...0.3)
+            let distance = tileSize * CGFloat.random(in: 0.15...0.3)
+            let seed = SKShapeNode(ellipseOf: CGSize(width: 4, height: 6))
+            seed.fillColor = SKColor(red: 0.15, green: 0.1, blue: 0.05, alpha: 1.0)
+            seed.strokeColor = .clear
+            seed.position = CGPoint(x: cos(angle) * distance, y: sin(angle) * distance)
+            seed.zRotation = angle
+            seed.zPosition = 3
+            container.addChild(seed)
+        }
+        
+        // Анимация пульсации
+        let expand = SKAction.scale(to: 1.15, duration: 0.1)
+        let contract = SKAction.scale(to: 0.9, duration: 0.1)
+        let pulse = SKAction.sequence([expand, contract])
+        mainBlast.run(SKAction.repeatForever(pulse))
+        
+        // Мерцание ядра
+        let fadeOut = SKAction.fadeAlpha(to: 0.5, duration: 0.08)
+        let fadeIn = SKAction.fadeAlpha(to: 1.0, duration: 0.08)
+        let flicker = SKAction.sequence([fadeOut, fadeIn])
+        core.run(SKAction.repeatForever(flicker))
         
         return container
     }

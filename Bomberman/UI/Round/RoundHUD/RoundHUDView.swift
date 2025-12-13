@@ -22,8 +22,11 @@ struct RoundHUDView: View {
 
                 Spacer()
 
-                RoundSurrenderButton {
-                    viewModel.surrender()
+                // Показываем кнопку "Сдаться" только для игроков, не для наблюдателей
+                if gameClient.me?.role != .spectator {
+                    RoundSurrenderButton {
+                        viewModel.surrender()
+                    }
                 }
             }
             .padding(.horizontal, 16)

@@ -9,7 +9,7 @@ import os
 # --- Константы (серверные) ---
 GRID_WIDTH = 20
 GRID_HEIGHT = 15
-BOMB_TIMER = 3
+BOMB_TIMER = 2  # Уменьшено с 3 до 2 секунд
 EXPLOSION_DURATION = 0.5
 BLAST_RADIUS = 2
 GAME_TICK_RATE = 1 / 60
@@ -166,18 +166,35 @@ class Game:
 
     def handle_input(self, player_id, action):
         player = self.players.get(player_id)
-        if not player: return
+        if not player: return False
 
         if self.state == "WAITING":
             if action['type'] == 'ready':
                 player.ready = not player.ready
                 print(f"Игрок '{player.name}' изменил статус готовности на: {player.ready}")
+                old_state = self.state
                 self.check_game_start()
-            return
+                # Если игра началась, возвращаем True
+                return self.state != old_state
+            return False
 
         if self.state == "IN_PROGRESS" and player.alive:
-            if action['type'] == 'move': player.move(action['dx'], action['dy'], self)
-            elif action['type'] == 'place_bomb': self.place_bomb(player.x, player.y)
+            if action['type'] == 'move': 
+                player.move(action['dx'], action['dy'], self)
+                return False
+            elif action['type'] == 'place_bomb': 
+                self.place_bomb(player.x, player.y)
+                return False
+            elif action['type'] == 'surrender':
+                player.alive = False
+                player.ready = False  # Сбрасываем ready статус при сдаче
+                print(f"Игрок '{player.name}' сдался.")
+                old_state = self.state
+                self.check_win_condition()  # Проверяем условия победы сразу
+                # Если игра завершилась, возвращаем True чтобы вызвать broadcast_state
+                return self.state != old_state
+        
+        return False
 
     def place_bomb(self, x, y):
         if not any(b.x == x and b.y == y for b in self.bombs): self.bombs.append(Bomb(x, y))
@@ -207,6 +224,9 @@ class Game:
             self.game_over_time = time.time()
             self.endgame_mode = False
             self.winner = alive_players[0].name if alive_players else "НИЧЬЯ"
+            # Сбрасываем ready статус у всех игроков сразу при завершении игры
+            for player in self.players.values():
+                player.ready = False
             print(f"--- ИГРА ОКОНЧЕНА! ПОБЕДИТЕЛЬ: {self.winner} ---")
             
     # УЛУЧШЕНИЕ: Новая функция для проверки стен
@@ -318,7 +338,10 @@ async def handler(websocket):
         if client_type == "player":
             async for message in websocket:
                 action = json.loads(message)
-                GAME.handle_input(client_id, action)
+                game_state_changed = GAME.handle_input(client_id, action)
+                # Если игра завершилась (например при surrender), сразу рассылаем состояние
+                if game_state_changed:
+                    await broadcast_state()
         else:
             await websocket.wait_closed()
 
