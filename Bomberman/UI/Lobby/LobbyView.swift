@@ -35,12 +35,19 @@ struct LobbyView: View {
 
             Spacer()
 
-            LobbyActionsView(
-                isReady: gameClient.isReady,
-                onToggleReady: { gameClient.toggleReady() }
-            )
-            .padding(.horizontal, 24)
-            .padding(.bottom, 24)
+            // Показываем метрики для наблюдателей, кнопку готовности для игроков
+            if gameClient.me?.role == .spectator {
+                SpectatorMetricsView()
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 24)
+            } else {
+                LobbyActionsView(
+                    isReady: gameClient.isReady,
+                    onToggleReady: { gameClient.toggleReady() }
+                )
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+            }
         }
         .background(Color.blackApp.ignoresSafeArea())
         .sheet(isPresented: $showLeaderboard) {

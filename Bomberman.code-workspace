@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../Downloads/bomberman/client"
+		},
+		{
+			"path": "../../../Downloads/bomberman/server"
+		},
+		{
+			"path": "../../../Downloads/bomberman/maps"
+		}
+	],
+	"settings": {}
+}

@@ -124,7 +124,7 @@ final class GameClient: ObservableObject {
     }
     
     func toggleReady() {
-        guard me != nil else { return }
+        guard let me = me, me.role != .spectator else { return }
         
         // Отправляем команду на сервер
         webSocketClient?.send(.ready)
