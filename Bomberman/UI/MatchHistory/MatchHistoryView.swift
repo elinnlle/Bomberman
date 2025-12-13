@@ -50,5 +50,8 @@ struct MatchHistoryView: View {
             .padding(.horizontal, 20)
             .padding(.top, 16)
         }
+        .onChange(of: gameClient.roundHistory) { _, _ in
+            viewModel.load()
+        }
     }
 }
