@@ -10,5 +10,12 @@
 		<string>HSESans-SemiBold.otf</string>
 		<string>HSESans-Thin.otf</string>
 	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

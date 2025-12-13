@@ -37,8 +37,7 @@ struct LobbyView: View {
 
             LobbyActionsView(
                 isReady: gameClient.isReady,
-                onToggleReady: { gameClient.toggleReady() },
-                onStartDemoRound: { gameClient.startRoundLocallyForDemo() }
+                onToggleReady: { gameClient.toggleReady() }
             )
             .padding(.horizontal, 24)
             .padding(.bottom, 24)
