@@ -41,7 +41,11 @@ final class RoundHUDViewModel: ObservableObject {
     }
 
     func backToLobby() {
-        // Просто возвращаемся в лобби без отключения от сервера
+        // если раунд уже закончился — сохраняем результат
+        if let result = gameClient.lastRoundResult {
+            gameClient.finishRound(with: result)
+        }
+
         gameClient.returnToLobby()
     }
 }

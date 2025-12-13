@@ -40,13 +40,15 @@ struct LobbyPlayerCardView: View {
 
             Spacer()
 
-            Button(action: onOpenAchievements) {
-                Image(systemName: "trophy.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.mainTextColor)
-                    .padding(8)
-                    .background(Color.lightGrayApp)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            if player.isMe {
+                Button(action: onOpenAchievements) {
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.mainTextColor)
+                        .padding(8)
+                        .background(Color.lightGrayApp)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                }
             }
         }
         .padding()
