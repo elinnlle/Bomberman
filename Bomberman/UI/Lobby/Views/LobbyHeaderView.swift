@@ -11,6 +11,8 @@ struct LobbyHeaderView: View {
     let onShowMatchHistory: () -> Void
     let onLeave: () -> Void
 
+    @State private var showConfirmDialog = false
+
     var body: some View {
         HStack(spacing: 12) {
             Text(title)
@@ -20,26 +22,25 @@ struct LobbyHeaderView: View {
             Spacer()
 
             Button(action: onShowLeaderboard) {
-                Text("Статистика")
-                    .appFont(.sansRegular, size: 14)
+                Image(systemName: "chart.bar.fill")
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.secondaryTextColor)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
+                    .frame(width: 32, height: 32)
                     .background(Color.lightGrayApp)
-                    .cornerRadius(10)
+                    .clipShape(Circle())
             }
 
             Button(action: onShowMatchHistory) {
-                Text("История")
-                    .appFont(.sansRegular, size: 14)
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.secondaryTextColor)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
+                    .frame(width: 32, height: 32)
                     .background(Color.lightGrayApp)
-                    .cornerRadius(10)
+                    .clipShape(Circle())
             }
-
-            Button(action: onLeave) {
+            Button {
+                showConfirmDialog = true
+            } label: {
                 Text("Выйти")
                     .appFont(.sansRegular, size: 14)
                     .foregroundColor(.secondaryTextColor)
@@ -49,6 +50,13 @@ struct LobbyHeaderView: View {
                     .cornerRadius(10)
             }
         }
+        .confirmDialog(
+            isPresented: $showConfirmDialog,
+            title: "Выйти из комнаты?",
+            message: "Вы действительно хотите покинуть комнату?",
+            confirmTitle: "Выйти",
+            cancelTitle: "Отмена",
+            onConfirm: onLeave
+        )
     }
 }
-
