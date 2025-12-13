@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct RoundHistoryEntry: Identifiable {
+struct RoundHistoryEntry: Identifiable, Equatable {
     let id: UUID
     let playerId: String
     let result: RoundResult
