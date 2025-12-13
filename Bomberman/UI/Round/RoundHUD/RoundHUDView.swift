@@ -36,8 +36,11 @@ struct RoundHUDView: View {
 
             if viewModel.shouldShowResult,
                let result = viewModel.roundResult {
+                let isSpectator = gameClient.me?.role == .spectator || gameClient.myPlayerId == nil
                 RoundResultOverlayView(
                     result: result,
+                    gameWinner: gameClient.gameWinner,
+                    isSpectator: isSpectator,
                     onBackToLobby: viewModel.backToLobby
                 )
                 .padding(.bottom, 40)

@@ -23,6 +23,7 @@ final class GameClient: ObservableObject {
     // Игровое состояние
     @Published var gameState: GameState?
     @Published var myPlayerId: String?
+    @Published var gameWinner: String? // Победитель игры (для наблюдателей)
     
     private var roundTimer: Timer?
     private var webSocketClient: WebSocketClient?
@@ -223,6 +224,7 @@ final class GameClient: ObservableObject {
         lastRoundResult = nil
         gameState = nil
         myPlayerId = nil
+        gameWinner = nil
         webSocketClient = nil
         pendingConnectionName = nil
         pendingConnectionRole = nil
@@ -294,6 +296,7 @@ final class GameClient: ObservableObject {
             roundPhase = .notInRound
             roundTimeRemaining = 0
             lastRoundResult = nil
+            gameWinner = nil
             hasSurrendered = false
             isReturningToLobby = false  // Сбрасываем флаг возврата
             statsAppliedForCurrentRound = false  // Сбрасываем флаг статистики
@@ -347,33 +350,38 @@ final class GameClient: ObservableObject {
     }
     
     private func determineRoundResult(from state: GameState) {
-        // Проверяем, наблюдатель ли мы
-        let isSpectator = me?.role == .spectator || myPlayerId == nil
+        // Проверяем, наблюдатель ли мы - проверяем и me?.role и myPlayerId
+        let isSpectator = (me?.role == .spectator) || (myPlayerId == nil && me == nil)
         
         if isSpectator {
-            // Для наблюдателя показываем результат игры (победитель/ничья), но не личный результат
-            if let winner = state.winner {
-                if winner == "НИЧЬЯ" {
-                    lastRoundResult = .draw
-                } else {
-                    // Для наблюдателя показываем ничью (не победа и не поражение)
-                    // Можно было бы показать .draw, но лучше показать что игра завершена
-                    lastRoundResult = .draw
-                }
+            // Для наблюдателя определяем реальный результат игры
+            // Сначала проверяем winner из состояния
+            if let winner = state.winner, !winner.isEmpty, winner != "НИЧЬЯ" {
+                // Есть победитель - сохраняем его имя
+                gameWinner = winner
+                lastRoundResult = .draw
             } else {
-                // Определяем по количеству выживших
+                // Если winner не установлен или это "НИЧЬЯ", определяем по количеству выживших
                 let alivePlayers = state.players.filter { $0.alive }
-                if alivePlayers.count == 0 {
-                    lastRoundResult = .draw
-                } else if alivePlayers.count == 1 {
-                    // Есть победитель - для наблюдателя это ничья (он не участвовал)
+                
+                if alivePlayers.count == 1 {
+                    // Есть один победитель
+                    gameWinner = alivePlayers[0].name
                     lastRoundResult = .draw
                 } else {
+                    // Нет выживших или несколько выживших - ничья
+                    gameWinner = nil
                     lastRoundResult = .draw
                 }
             }
             // Не применяем результат к статистике для наблюдателя
             return
+        }
+        
+        // Для игроков сбрасываем gameWinner (он нужен только для наблюдателей)
+        // Но только если мы действительно игрок, а не наблюдатель
+        if me?.role != .spectator {
+            gameWinner = nil
         }
         
         // Для игрока определяем личный результат
