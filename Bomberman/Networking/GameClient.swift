@@ -147,10 +147,13 @@ final class GameClient: ObservableObject {
         // Статистика применяется в determineRoundResult, не дублируем здесь
         // applyResultToStats(result)
 
+        let ROUND_DURATION: TimeInterval = 120 // 2 минуты (соответствует серверу)
+        let duration = max(0, ROUND_DURATION - roundTimeRemaining)
+        
         let entry = RoundHistoryEntry(
             playerId: mePlayer.id,
             result: result,
-            duration: 90 - roundTimeRemaining
+            duration: duration
         )
 
         roundHistory[mePlayer.id, default: []].append(entry)
@@ -414,6 +417,20 @@ final class GameClient: ObservableObject {
         if let result = lastRoundResult, !statsAppliedForCurrentRound {
             applyResultToStats(result)
             statsAppliedForCurrentRound = true
+            
+            // Записываем историю раунда
+            if let mePlayer = me {
+                let ROUND_DURATION: TimeInterval = 120 // 2 минуты (соответствует серверу)
+                let duration = max(0, ROUND_DURATION - roundTimeRemaining)
+                
+                let entry = RoundHistoryEntry(
+                    playerId: mePlayer.id,
+                    result: result,
+                    duration: duration
+                )
+                
+                roundHistory[mePlayer.id, default: []].append(entry)
+            }
         }
     }
     

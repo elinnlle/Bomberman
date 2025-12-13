@@ -16,9 +16,12 @@ GAME_TICK_RATE = 1 / 60
 MIN_PLAYERS_TO_START = 2
 GAME_OVER_DURATION = 5
 ROUND_DURATION = 120 # 2 минуты
-# ИСПРАВЛЕНО: Шанс уменьшен для лучшего баланса.
-# При 60 тиках/сек это ~1 бомба каждые 4 секунды (1 / (60 * 0.004))
-ENDGAME_BOMB_CHANCE = 0.004
+# Базовый шанс спавна бомбы в endgame режиме
+# При 60 тиках/сек базовый шанс 0.01 = ~1 бомба каждые 1.7 секунды
+# После окончания таймера шанс увеличивается динамически
+ENDGAME_BOMB_CHANCE_BASE = 0.01
+ENDGAME_BOMB_CHANCE_MAX = 0.05  # Максимальный шанс (~1 бомба каждые 0.3 секунды)
+ENDGAME_INITIAL_BOMBS = 5  # Количество бомб, спавнящихся сразу при активации endgame
 
 # Глобальный словарь для хранения загруженных карт
 AVAILABLE_MAPS = {}
@@ -116,6 +119,7 @@ class Game:
         self.state = "WAITING"
         self.winner, self.game_over_time, self.round_start_time = None, None, None
         self.endgame_mode = False
+        self.endgame_start_time = None  # Время активации endgame режима
         
         # Безопасно сбрасываем состояние игроков
         self.available_starts = self._find_start_positions()
@@ -237,11 +241,29 @@ class Game:
         time_is_up = self.round_start_time and (time.time() - self.round_start_time > ROUND_DURATION)
         if not self.endgame_mode and (time_is_up or self.are_all_bricks_destroyed()):
             self.endgame_mode = True
+            self.endgame_start_time = time.time()
             print("--- ЭНДГЕЙМ АКТИВИРОВАН ---")
+            # Спавним несколько бомб сразу для "суеты"
+            for _ in range(ENDGAME_INITIAL_BOMBS):
+                self.spawn_random_bomb()
 
     def spawn_random_bomb(self):
-        if random.random() < ENDGAME_BOMB_CHANCE:
-            empty_tiles = [(x, y) for y, row in enumerate(self.map) for x, tile in enumerate(row) if self.original_map[y][x] in [' ', 'p', '.']]
+        # Вычисляем динамический шанс спавна бомбы
+        # Шанс увеличивается со временем после активации endgame
+        bomb_chance = ENDGAME_BOMB_CHANCE_BASE
+        if self.endgame_mode and self.endgame_start_time:
+            # Время с момента активации endgame (в секундах)
+            time_since_endgame = time.time() - self.endgame_start_time
+            # Увеличиваем шанс линейно от базового до максимального за 30 секунд
+            progress = min(time_since_endgame / 30.0, 1.0)
+            bomb_chance = ENDGAME_BOMB_CHANCE_BASE + (ENDGAME_BOMB_CHANCE_MAX - ENDGAME_BOMB_CHANCE_BASE) * progress
+        
+        if random.random() < bomb_chance:
+            # Проверяем текущее состояние карты, а не только original_map
+            # Бомба может заспавниться только на пустых тайлах (не стена и не кирпич)
+            empty_tiles = [(x, y) for y, row in enumerate(self.map) 
+                          for x, tile in enumerate(row) 
+                          if self.map[y][x] == ' ' and self.original_map[y][x] in [' ', 'p', '.']]
             if empty_tiles:
                 x, y = random.choice(empty_tiles)
                 self.place_bomb(x, y)
@@ -257,6 +279,9 @@ class Game:
     def create_explosion(self, start_x, start_y):
         self.explosions.append(Explosion(start_x, start_y))
         self._check_collisions(start_x, start_y)
+        # Разрушаем кирпич под бомбой, если он есть
+        if 0 <= start_x < GRID_WIDTH and 0 <= start_y < GRID_HEIGHT and self.map[start_y][start_x] == '.':
+            self.map[start_y][start_x] = ' '
         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             for i in range(1, BLAST_RADIUS + 1):
                 x, y = start_x + dx * i, start_y + dy * i
