@@ -28,6 +28,7 @@ final class GameClient: ObservableObject {
     private var webSocketClient: WebSocketClient?
     private var pendingConnectionName: String?
     private var pendingConnectionRole: PlayerRole?
+    private var hasSurrendered: Bool = false
     
     // URL сервера - можно настроить через настройки приложения
     private let serverURL: URL = {
@@ -113,6 +114,7 @@ final class GameClient: ObservableObject {
         roundTimer?.invalidate()
         roundPhase = .finished
         lastRoundResult = result
+        hasSurrendered = true  // Помечаем что игрок сдался локально
 
         guard
             let result,
@@ -145,6 +147,12 @@ final class GameClient: ObservableObject {
         webSocketClient?.send(.placeBomb)
     }
     
+    func returnToLobby() {
+        hasSurrendered = false
+        roundPhase = .notInRound
+        lastRoundResult = nil
+    }
+    
     private func cleanup() {
         roundTimer?.invalidate()
         roundTimer = nil
@@ -160,6 +168,7 @@ final class GameClient: ObservableObject {
         webSocketClient = nil
         pendingConnectionName = nil
         pendingConnectionRole = nil
+        hasSurrendered = false
     }
     
     private func handleServerMessage(_ message: ServerMessage) {
@@ -209,12 +218,22 @@ final class GameClient: ObservableObject {
             isReady = myPlayerPos.ready
         }
         
+        // Если игрок сдался — не обновляем фазу раунда от сервера
+        if hasSurrendered {
+            // Только обновляем таймер для отображения
+            if let timeRemaining = state.timeRemaining {
+                roundTimeRemaining = max(0, timeRemaining)
+            }
+            return
+        }
+        
         // Обновляем фазу раунда
         switch state.state {
         case .waiting:
             roundPhase = .notInRound
             roundTimeRemaining = 0
             lastRoundResult = nil
+            hasSurrendered = false  // Сбрасываем флаг при возврате в лобби
             
         case .inProgress:
             if roundPhase != .running {

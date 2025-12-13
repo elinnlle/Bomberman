@@ -41,7 +41,7 @@ struct RoundHUDView: View {
             }
         }
         .padding(.top, 8)
-        .onChange(of: gameClient.roundTimeRemaining) { _ in
+        .onChange(of: gameClient.roundTimeRemaining) { _, _ in
             viewModel.updateTime()
         }
     }

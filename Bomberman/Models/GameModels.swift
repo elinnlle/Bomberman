@@ -72,14 +72,14 @@ struct PlayerStats: Identifiable, Equatable {
 
 // MARK: - Game State Models
 
-enum TileType: String {
+enum TileType: String, Equatable {
     case empty = " "
     case wall = "#"
     case brick = "."
     case startPosition = "p"
 }
 
-struct GameMap {
+struct GameMap: Equatable {
     let width: Int
     let height: Int
     let tiles: [[TileType]]
@@ -119,13 +119,13 @@ struct PlayerPosition: Identifiable, Equatable {
     let ready: Bool
 }
 
-enum GameStateType: String {
+enum GameStateType: String, Equatable {
     case waiting = "WAITING"
     case inProgress = "IN_PROGRESS"
     case gameOver = "GAME_OVER"
 }
 
-struct GameState {
+struct GameState: Equatable {
     let state: GameStateType
     let winner: String?
     let timeRemaining: TimeInterval?

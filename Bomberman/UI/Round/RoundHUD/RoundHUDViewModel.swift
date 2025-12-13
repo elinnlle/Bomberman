@@ -33,11 +33,16 @@ final class RoundHUDViewModel: ObservableObject {
     }
 
     func surrender() {
+        // Записываем поражение в статистику и отключаемся от сервера
         gameClient.finishRound(with: .defeat)
+        // Небольшая задержка чтобы показать результат
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            self?.gameClient.leaveRoom()
+        }
     }
 
     func backToLobby() {
-        gameClient.roundPhase = .notInRound
+        gameClient.leaveRoom()
     }
 }
 
