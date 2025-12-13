@@ -333,52 +333,33 @@ final class GameScene: SKScene {
         let container = SKNode()
         container.zPosition = 15
         
-        // Арбузные цвета для взрыва (красная мякоть + зелёные осколки)
-        let redColors: [SKColor] = [
-            SKColor(red: 1.0, green: 0.2, blue: 0.2, alpha: 1.0),  // Красный
-            SKColor(red: 0.95, green: 0.3, blue: 0.3, alpha: 1.0), // Светло-красный
-            SKColor(red: 0.85, green: 0.15, blue: 0.15, alpha: 1.0) // Тёмно-красный
-        ]
+        // Загружаем логотип из ассетов
+        let logoTexture = SKTexture(imageNamed: "logo")
+        let logoSprite = SKSpriteNode(texture: logoTexture)
         
-        // Основной взрыв (красная мякоть арбуза)
-        let mainBlast = SKShapeNode(circleOfRadius: tileSize * 0.45)
-        mainBlast.fillColor = redColors[0]
-        mainBlast.strokeColor = .clear
-        mainBlast.alpha = 0.95
-        mainBlast.zPosition = 1
-        container.addChild(mainBlast)
+        // Масштабируем логотип под размер тайла
+        let scale = tileSize / max(logoTexture.size().width, logoTexture.size().height) * 0.9
+        logoSprite.setScale(scale)
+        logoSprite.zPosition = 1
+        logoSprite.alpha = 0.95
         
-        // Яркий центр
-        let core = SKShapeNode(circleOfRadius: tileSize * 0.2)
-        core.fillColor = SKColor(red: 1.0, green: 0.6, blue: 0.6, alpha: 1.0)
-        core.strokeColor = .clear
-        core.zPosition = 2
-        container.addChild(core)
+        container.addChild(logoSprite)
         
-        // Семечки арбуза (чёрные точки)
-        for i in 0..<5 {
-            let angle = CGFloat(i) * .pi * 2 / 5 + CGFloat.random(in: -0.3...0.3)
-            let distance = tileSize * CGFloat.random(in: 0.15...0.3)
-            let seed = SKShapeNode(ellipseOf: CGSize(width: 4, height: 6))
-            seed.fillColor = SKColor(red: 0.15, green: 0.1, blue: 0.05, alpha: 1.0)
-            seed.strokeColor = .clear
-            seed.position = CGPoint(x: cos(angle) * distance, y: sin(angle) * distance)
-            seed.zRotation = angle
-            seed.zPosition = 3
-            container.addChild(seed)
-        }
-        
-        // Анимация пульсации
-        let expand = SKAction.scale(to: 1.15, duration: 0.1)
-        let contract = SKAction.scale(to: 0.9, duration: 0.1)
+        // Анимация пульсации для логотипа
+        let expand = SKAction.scale(to: scale * 1.2, duration: 0.1)
+        let contract = SKAction.scale(to: scale * 0.9, duration: 0.1)
         let pulse = SKAction.sequence([expand, contract])
-        mainBlast.run(SKAction.repeatForever(pulse))
+        logoSprite.run(SKAction.repeatForever(pulse))
         
-        // Мерцание ядра
-        let fadeOut = SKAction.fadeAlpha(to: 0.5, duration: 0.08)
-        let fadeIn = SKAction.fadeAlpha(to: 1.0, duration: 0.08)
+        // Мерцание логотипа
+        let fadeOut = SKAction.fadeAlpha(to: 0.6, duration: 0.08)
+        let fadeIn = SKAction.fadeAlpha(to: 0.95, duration: 0.08)
         let flicker = SKAction.sequence([fadeOut, fadeIn])
-        core.run(SKAction.repeatForever(flicker))
+        logoSprite.run(SKAction.repeatForever(flicker))
+        
+        // Вращение логотипа для эффекта
+        let rotate = SKAction.rotate(byAngle: .pi * 2, duration: 0.5)
+        logoSprite.run(SKAction.repeatForever(rotate))
         
         return container
     }
@@ -419,26 +400,29 @@ final class GameScene: SKScene {
         let container = SKNode()
         container.zPosition = 25
         
-        let color = isMe ? myPlayerColor : otherPlayerColor
-        let headColor = isMe ? SKColor(red: 0.588, green: 0.784, blue: 1.0, alpha: 1.0)
-                             : SKColor(red: 1.0, green: 0.784, blue: 0.588, alpha: 1.0)
+        // Загружаем спрайт вороны из ассетов
+        let birdTexture = SKTexture(imageNamed: "bird")
+        let birdSprite = SKSpriteNode(texture: birdTexture)
         
-        // Тело
-        let body = SKShapeNode(rectOf: CGSize(width: tileSize - 10, height: tileSize - 20), cornerRadius: 5)
-        body.fillColor = color
-        body.strokeColor = .clear
-        body.position = CGPoint(x: 0, y: -5)
-        container.addChild(body)
+        // Масштабируем ворону под размер тайла
+        let scale = tileSize / max(birdTexture.size().width, birdTexture.size().height) * 0.8
+        birdSprite.setScale(scale)
+        birdSprite.zPosition = 1
         
-        // Голова
-        let head = SKShapeNode(circleOfRadius: tileSize * 0.3)
-        head.fillColor = headColor
-        head.strokeColor = .clear
-        head.position = CGPoint(x: 0, y: tileSize * 0.2)
-        head.zPosition = 1
-        container.addChild(head)
+        // Цветовая фильтрация для различия своего и других игроков
+        if isMe {
+            // Свой игрок - синий оттенок
+            birdSprite.color = myPlayerColor
+            birdSprite.colorBlendFactor = 0.3
+        } else {
+            // Другие игроки - оранжевый оттенок
+            birdSprite.color = otherPlayerColor
+            birdSprite.colorBlendFactor = 0.3
+        }
         
-        // Имя
+        container.addChild(birdSprite)
+        
+        // Имя над вороной
         let nameLabel = SKLabelNode(text: name)
         nameLabel.fontName = "HelveticaNeue-Bold"
         nameLabel.fontSize = tileSize * 0.35
@@ -457,6 +441,34 @@ final class GameScene: SKScene {
         shadow.zPosition = 1
         shadow.horizontalAlignmentMode = .center
         container.addChild(shadow)
+        
+        return container
+    }
+    
+    private func createHSELogo(size: CGFloat) -> SKNode {
+        let container = SKNode()
+        
+        // Создаем текстовый логотип "HSE"
+        let logoLabel = SKLabelNode(text: "HSE")
+        logoLabel.fontName = "HelveticaNeue-Bold"
+        logoLabel.fontSize = size * 0.5
+        logoLabel.fontColor = .white
+        logoLabel.horizontalAlignmentMode = .center
+        logoLabel.verticalAlignmentMode = .center
+        logoLabel.zPosition = 1
+        
+        // Добавляем тень для лучшей читаемости
+        let shadow = SKLabelNode(text: "HSE")
+        shadow.fontName = "HelveticaNeue-Bold"
+        shadow.fontSize = size * 0.5
+        shadow.fontColor = SKColor(white: 0, alpha: 0.3)
+        shadow.horizontalAlignmentMode = .center
+        shadow.verticalAlignmentMode = .center
+        shadow.position = CGPoint(x: 1, y: -1)
+        shadow.zPosition = 0
+        
+        container.addChild(shadow)
+        container.addChild(logoLabel)
         
         return container
     }
