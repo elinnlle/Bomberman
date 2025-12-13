@@ -268,6 +268,10 @@ final class GameClient: ObservableObject {
         
         players = newPlayers
         
+        for player in newPlayers {
+            ensureStats(for: player)
+        }
+        
         // Обновляем информацию о себе
         if let myId = myPlayerId,
            let myPlayerPos = state.players.first(where: { $0.id == myId }) {
@@ -426,22 +430,32 @@ final class GameClient: ObservableObject {
     }
     
     private func applyResultToStats(_ result: RoundResult) {
-        guard let mePlayer = me else { return }
-        
-        ensureStats(for: mePlayer)
-        
-        guard var stats = playerStats[mePlayer.id] else { return }
-        
-        switch result {
-        case .victory:
-            stats.wins += 1
-        case .defeat:
-            stats.losses += 1
-        case .draw:
-            stats.draws += 1
+        for player in players {
+            ensureStats(for: player)
+
+            guard var stats = playerStats[player.id] else { continue }
+
+            switch result {
+            case .victory:
+                if player.isMe {
+                    stats.wins += 1
+                } else {
+                    stats.losses += 1
+                }
+
+            case .defeat:
+                if player.isMe {
+                    stats.losses += 1
+                } else {
+                    stats.wins += 1
+                }
+
+            case .draw:
+                stats.draws += 1
+            }
+
+            playerStats[player.id] = stats
         }
-        
-        playerStats[mePlayer.id] = stats
     }
 }
 
